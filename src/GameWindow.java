@@ -80,6 +80,8 @@ public class GameWindow extends JPanel implements Runnable {
         Graphics2D g2d = (Graphics2D) g;
 
         g2d.setColor(Color.white);
-        g2d.fillOval(playerX, playerY, 48, 48);
+        g2d.fillOval(playerX+50, playerY+50, 30, 30);
+        g2d.drawLine(playerX+65, playerY+65, playerX+65, playerY+150);
+
     }
 }
