@@ -72,16 +72,21 @@ public class GameWindow extends JPanel implements Runnable {
         if (keyHandler.rightPressed) {
             playerX += playerSpeed;
         }
+
+
     }
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
         Graphics2D g2d = (Graphics2D) g;
-
+        double s = 0.25;
         g2d.setColor(Color.white);
-        g2d.fillOval(playerX+50, playerY+50, 30, 30);
-        g2d.drawLine(playerX+65, playerY+65, playerX+65, playerY+150);
-
+        g2d.fillOval((int)(playerX+50*s), (int)(playerY+50*s), (int)(30*s), (int)(30*s));
+        g2d.drawLine((int)(playerX+65*s), (int)(playerY+65*s), (int)(playerX+65*s), (int)(playerY+150*s));
+        g2d.drawLine((int)(playerX+65*s), (int)(playerY+90*s), (int)(playerX+90*s), (int)(playerY+125*s));
+        g2d.drawLine((int)(playerX+65*s), (int)(playerY+90*s), (int)(playerX+40*s), (int)(playerY+125*s));
+        g2d.drawLine((int)(playerX+65*s), (int)(playerY+150*s), (int)(playerX+40*s), (int)(playerY+200*s));
+        g2d.drawLine((int)(playerX+65*s), (int)(playerY+150*s), (int)(playerX+90*s), (int)(playerY+200*s));
     }
 }
