@@ -72,8 +72,6 @@ public class GameWindow extends JPanel implements Runnable {
         if (keyHandler.rightPressed) {
             playerX += playerSpeed;
         }
-
-
     }
 
     public void paintComponent(Graphics g) {
