@@ -10,7 +10,7 @@ public class Main extends JFrame {
         JFrame frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setResizable(false);
-        frame.setTitle("The One");
+        frame.setTitle("The 3rd Dimension");
 
         GameWindow gameWindow = new GameWindow();
         frame.add(gameWindow);
