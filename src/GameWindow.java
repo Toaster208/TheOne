@@ -38,7 +38,6 @@ public class GameWindow extends JPanel implements Runnable {
         long currentTime;
 
         long timer = 0;
-        int drawCount = 0;
 
         while (gameThread != null) {
             currentTime = System.nanoTime();
@@ -54,11 +53,9 @@ public class GameWindow extends JPanel implements Runnable {
                 repaint(); // Calls the paintComponent() method
 
                 delta--;
-                drawCount++;
             }
 
             if (timer >= 1000000000) {
-                drawCount = 0;
                 timer = 0;
             }
         }
@@ -104,15 +101,17 @@ public class GameWindow extends JPanel implements Runnable {
         super.paintComponent(g);
 
         Graphics2D g2d = (Graphics2D) g;
-        double s = 0.5;
+        double s = 0.5; //this variable doesn't work*
         g2d.setColor(Color.white);
         g2d.drawLine(0, 576*2/3, 768, 576*2/3);
-        g2d.fillOval((int)(playerX+50*s), (int)(playerY+50*s), (int)(30*s), (int)(30*s));
-        g2d.drawLine((int)(playerX+65*s), (int)(playerY+65*s), (int)(playerX+65*s), (int)(playerY+150*s));
-        g2d.drawLine((int)(playerX+65*s), (int)(playerY+90*s), (int)(playerX+90*s), (int)(playerY+125*s));
-        g2d.drawLine((int)(playerX+65*s), (int)(playerY+90*s), (int)(playerX+40*s), (int)(playerY+125*s));
-        g2d.drawLine((int)(playerX+65*s), (int)(playerY+150*s), (int)(playerX+40*s), (int)(playerY+200*s));
-        g2d.drawLine((int)(playerX+65*s), (int)(playerY+150*s), (int)(playerX+90*s), (int)(playerY+200*s));
+        g2d.fillOval((int)(playerX+0*s), (int)(playerY+50*s), (int)(30*s), (int)(30*s));
+        g2d.drawLine((int)(playerX+15*s), (int)(playerY+65*s), (int)(playerX+15*s), (int)(playerY+150*s));
+        g2d.drawLine((int)(playerX+15*s), (int)(playerY+90*s), (int)(playerX+40*s), (int)(playerY+125*s));
+        g2d.drawLine((int)(playerX+15*s), (int)(playerY+90*s), (int)(playerX-10*s), (int)(playerY+125*s));
+        g2d.drawLine((int)(playerX+15*s), (int)(playerY+150*s), (int)(playerX-10*s), (int)(playerY+200*s));
+        g2d.drawLine((int)(playerX+15*s), (int)(playerY+150*s), (int)(playerX+40*s), (int)(playerY+200*s));
+        //platform in the middle of a screen:
+        g2d.drawLine(768/4, 576/2, 768*3/4, 576/2);
+        
     }
-
 }
