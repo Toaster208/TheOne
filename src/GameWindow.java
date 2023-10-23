@@ -66,19 +66,19 @@ public class GameWindow extends JPanel implements Runnable {
     }
 
     public void update() {
-        if (collidingX()) {
+        if (colliding()) {
             if (keyHandler.leftPressed) {
                 playerX+=playerSpeed;
             } else if (keyHandler.rightPressed) {
                 playerX-=playerSpeed;
             }
-        }
-        if (collidingY()) {
-            playerY-=playerSpeed;
-            isJumping = false;
-        }
-        if (!collidingY() && playerY <= 307) {
-            isJumping = true;
+            if (keyHandler.upPressed) {
+                jumpVelocity=1;
+            }
+            if(!keyHandler.upPressed){
+                isJumping = false;
+            }
+            //TODO: player doesn't fall off platforms after jumping onto them.
         }
         if (keyHandler.upPressed && !isJumping) {
             // Start jumping
@@ -88,6 +88,9 @@ public class GameWindow extends JPanel implements Runnable {
 
         if (isJumping) {
             // Update jump physics
+            if (!keyHandler.upPressed) {
+                jumpVelocity = Math.abs(jumpVelocity);
+            }
             playerY += jumpVelocity;
             jumpVelocity += jumpAcceleration;
             if (keyHandler.leftPressed) {
@@ -142,34 +145,35 @@ public class GameWindow extends JPanel implements Runnable {
         objectsX.add(800*3/4);
         objectsY.add(600/2);
         objectsY.add(600/2);
+        //objectsX.get(i) determines the start X of the platform
+        //objectsX.get(i+1) determines the end X of the platform
+        //objectsY.get(i) determines the start Y of the platform
+        //objectsY.get(i+1) determines the end Y of the platform
     }
-    //TODO: fix collision
-//     private boolean collidingX() {
-//         //check if boundary box intersects with objects
-//         for (int i = 0; i < objectsX.size(); i+=2) {
+    public boolean colliding() {
+        //Using boundary box to check for collision
+        int playerLeft = (int)(playerX - 10 * 0.5);
+        int playerRight = (int)(playerX + 40 * 0.5);
+        int playerTop = playerY;
+        int playerBottom = (int)(playerY + 150 * 0.5);
 
-//             if (playerX+40*0.5 >= objectsX.get(i) && playerX-10*0.5 <= objectsX.get(i+1)) {
-//                 if (playerY+150*0.5 >= objectsY.get(i) && playerY <= objectsY.get(i+1)) {
-//                     return true;
-//                 }
-//             }
-//         }
-        
+        // Check for collision with each object
+        for (int i = 0; i < objectsX.size(); i += 2) {
+            int objectLeft = objectsX.get(i);
+            int objectRight = objectsX.get(i + 1);
+            int objectTop = objectsY.get(i);
+            int objectBottom = objectsY.get(i + 1);
 
-//         return false;
-//     }
+            // Check if the boundaries overlap
+            if (playerRight >= objectLeft && playerLeft <= objectRight &&
+                playerBottom >= objectTop && playerTop <= objectBottom) {
+                    if (playerBottom >= objectBottom) {
+                        playerY = objectBottom - 76;
+                    }
+                return true; // Collision detected
+            }
+        }
 
-//     private boolean collidingY() {
-//         //check if boundary box intersects with objects
-//         for (int i = 0; i < objectsX.size(); i+=2) {
-
-//             if (playerY+150*0.5 >= objectsY.get(i) && playerY <= objectsY.get(i+1)) {
-//                 if (playerX+40*0.5 <= objectsX.get(i) && playerX-10*0.5 >= objectsX.get(i+1)) {
-//                     return true;
-//                 }
-//             }
-//         }
-
-//         return false;
-//     }
-// }
+        return false; // No collision detected
+    }
+}
