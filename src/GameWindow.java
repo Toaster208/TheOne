@@ -3,6 +3,8 @@ import java.awt.*;
 
 import javax.swing.JPanel;
 
+import java.util.*;
+
 
 public class GameWindow extends JPanel implements Runnable {
 
@@ -10,16 +12,18 @@ public class GameWindow extends JPanel implements Runnable {
     Thread gameThread;
 
     int playerX = 100;
-    int playerY = 284;
+    int playerY = 307;
     int playerSpeed = 4;
-    int playerDimension = 1;
+    // int playerDimension = 1;
     // Jump variables
     double jumpVelocity = 0; // Initial jump velocity
     double jumpAcceleration = 0.5; // Acceleration due to gravity
     boolean isJumping = false;
+    ArrayList<Integer> objectsX = new ArrayList<Integer>();
+    ArrayList<Integer> objectsY = new ArrayList<Integer>();
 
     public GameWindow() {
-        this.setPreferredSize(new Dimension(768, 576));
+        this.setPreferredSize(new Dimension(800, 600));
         this.setBackground(Color.black);
         this.setDoubleBuffered(true);
         this.addKeyListener(keyHandler);
@@ -62,6 +66,20 @@ public class GameWindow extends JPanel implements Runnable {
     }
 
     public void update() {
+        if (collidingX()) {
+            if (keyHandler.leftPressed) {
+                playerX+=playerSpeed;
+            } else if (keyHandler.rightPressed) {
+                playerX-=playerSpeed;
+            }
+        }
+        if (collidingY()) {
+            playerY-=playerSpeed;
+            isJumping = false;
+        }
+        if (!collidingY() && playerY <= 307) {
+            isJumping = true;
+        }
         if (keyHandler.upPressed && !isJumping) {
             // Start jumping
             isJumping = true;
@@ -79,10 +97,10 @@ public class GameWindow extends JPanel implements Runnable {
                 playerX += playerSpeed;
             }
 
-            if (playerY >= 284) {
+            if (playerY >= 307) {
                 // Ground level, end the jump
                 isJumping = false;
-                playerY = 284; // Reset to ground level
+                playerY = 307; // Reset to ground level
             }
 
         } else {
@@ -104,14 +122,54 @@ public class GameWindow extends JPanel implements Runnable {
         double s = 0.5; //this variable doesn't work*
         g2d.setColor(Color.white);
         g2d.drawLine(0, 576*2/3, 768, 576*2/3);
-        g2d.fillOval((int)(playerX+0*s), (int)(playerY+50*s), (int)(30*s), (int)(30*s));
-        g2d.drawLine((int)(playerX+15*s), (int)(playerY+65*s), (int)(playerX+15*s), (int)(playerY+150*s));
-        g2d.drawLine((int)(playerX+15*s), (int)(playerY+90*s), (int)(playerX+40*s), (int)(playerY+125*s));
-        g2d.drawLine((int)(playerX+15*s), (int)(playerY+90*s), (int)(playerX-10*s), (int)(playerY+125*s));
-        g2d.drawLine((int)(playerX+15*s), (int)(playerY+150*s), (int)(playerX-10*s), (int)(playerY+200*s));
-        g2d.drawLine((int)(playerX+15*s), (int)(playerY+150*s), (int)(playerX+40*s), (int)(playerY+200*s));
-        //platform in the middle of a screen:
-        g2d.drawLine(768/4, 576/2, 768*3/4, 576/2);
+        //Todo: shift playerX and playerY to corner of player
+        g2d.fillOval((int)(playerX), (int)(playerY), (int)(30*s), (int)(30*s));
+        g2d.drawLine((int)(playerX+15*s), (int)(playerY+15*s), (int)(playerX+15*s), (int)(playerY+100*s));
+        g2d.drawLine((int)(playerX+15*s), (int)(playerY+40*s), (int)(playerX+40*s), (int)(playerY+75*s));
+        g2d.drawLine((int)(playerX+15*s), (int)(playerY+40*s), (int)(playerX-10*s), (int)(playerY+75*s));
+        g2d.drawLine((int)(playerX+15*s), (int)(playerY+100*s), (int)(playerX-10*s), (int)(playerY+150*s));
+        g2d.drawLine((int)(playerX+15*s), (int)(playerY+100*s), (int)(playerX+40*s), (int)(playerY+150*s));
+
+        //boundary box
+        g2d.drawLine((int)(playerX-10*s), playerY, (int)(playerX+40*s), playerY);
+        g2d.drawLine((int)(playerX+40*s), playerY, (int)(playerX+40*s), (int)(playerY+150*s));
+        g2d.drawLine((int)(playerX+40*s), (int)(playerY+150*s), (int)(playerX-10*s), (int)(playerY+150*s));
+        g2d.drawLine((int)(playerX-10*s), (int)(playerY+150*s), (int)(playerX-10*s), playerY);
         
+        //platform in the middle of the screen:
+        g2d.drawLine(800/4, 600/2, 800*3/4, 600/2);
+        objectsX.add(800/4);
+        objectsX.add(800*3/4);
+        objectsY.add(600/2);
+        objectsY.add(600/2);
     }
-}
+    //TODO: fix collision
+//     private boolean collidingX() {
+//         //check if boundary box intersects with objects
+//         for (int i = 0; i < objectsX.size(); i+=2) {
+
+//             if (playerX+40*0.5 >= objectsX.get(i) && playerX-10*0.5 <= objectsX.get(i+1)) {
+//                 if (playerY+150*0.5 >= objectsY.get(i) && playerY <= objectsY.get(i+1)) {
+//                     return true;
+//                 }
+//             }
+//         }
+        
+
+//         return false;
+//     }
+
+//     private boolean collidingY() {
+//         //check if boundary box intersects with objects
+//         for (int i = 0; i < objectsX.size(); i+=2) {
+
+//             if (playerY+150*0.5 >= objectsY.get(i) && playerY <= objectsY.get(i+1)) {
+//                 if (playerX+40*0.5 <= objectsX.get(i) && playerX-10*0.5 >= objectsX.get(i+1)) {
+//                     return true;
+//                 }
+//             }
+//         }
+
+//         return false;
+//     }
+// }
