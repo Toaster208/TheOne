@@ -11,7 +11,7 @@ public class GameWindow extends JPanel implements Runnable {
     KeyHandler keyHandler = new KeyHandler();
     Thread gameThread;
 
-    int groundLevel = 307;
+    int groundLevel = 325;
     int playerX = 100;
     int playerY = groundLevel;
     int playerSpeed = 4;
@@ -68,6 +68,22 @@ public class GameWindow extends JPanel implements Runnable {
 
     public void update() {
         //TODO: check for specific collision (top, bottom, right, left)
+        //FIXME: collLeft and collRight detect at the same time, nullifying the collison. fix their if statements.
+        if (collTop()) {
+            jumpVelocity = 1;
+        }
+
+        if (collBottom()) {
+            isJumping = false;
+        }
+
+        // if (collLeft()) {
+        //     playerX+=playerSpeed;
+        // }
+
+        // if (collRight()) {
+        //     playerX-=playerSpeed;
+        // }
         // if (colliding()) {
         //     if (keyHandler.leftPressed) {
         //         playerX+=playerSpeed;
@@ -128,7 +144,7 @@ public class GameWindow extends JPanel implements Runnable {
         Graphics2D g2d = (Graphics2D) g;
         double s = 0.5; //this variable doesn't work*
         g2d.setColor(Color.white);
-        g2d.drawLine(0, 576*2/3, 768, 576*2/3);
+        g2d.drawLine(0, 600*2/3, 800, 600*2/3);
         //Todo: shift playerX and playerY to corner of player
         g2d.fillOval((int)(playerX), (int)(playerY), (int)(30*s), (int)(30*s));
         g2d.drawLine((int)(playerX+15*s), (int)(playerY+15*s), (int)(playerX+15*s), (int)(playerY+100*s));
@@ -154,30 +170,48 @@ public class GameWindow extends JPanel implements Runnable {
         //objectsY.get(i) determines the start Y of the platform
         //objectsY.get(i+1) determines the end Y of the platform
     }
-    public boolean colliding() {
-        //Using boundary box to check for collision
-        int playerLeft = (int)(playerX - 10 * 0.5);
-        int playerRight = (int)(playerX + 40 * 0.5);
-        int playerTop = playerY;
-        int playerBottom = (int)(playerY + 150 * 0.5);
 
-        // Check for collision with each object
-        for (int i = 0; i < objectsX.size(); i += 2) {
-            int objectLeft = objectsX.get(i);
-            int objectRight = objectsX.get(i + 1);
-            int objectTop = objectsY.get(i);
-            int objectBottom = objectsY.get(i + 1);
+// private boolean collLeft() {
+//     int playerLeft = (int)(playerX - 10 * 0.5);
+//     for (int i = 0; i < objectsX.size(); i += 2) {
+//         int objectRight = objectsX.get(i + 1);
+//         if (playerLeft <= objectRight) {
+//             return true; // Collision detected
+//         }
+//     }
+//     return false; // No collision detected
+// }
 
-            // Check if the boundaries overlap
-            if (playerRight >= objectLeft && playerLeft <= objectRight &&
-                playerBottom >= objectTop && playerTop <= objectBottom) {
-                    if (playerBottom >= objectBottom) {
-                        playerY = objectBottom - 76;
-                    }
-                return true; // Collision detected
-            }
+// private boolean collRight() {
+//     int playerRight = (int)(playerX + 40 * 0.5);
+//     for (int i = 0; i < objectsX.size(); i += 2) {
+//         int objectLeft = objectsX.get(i);
+//         if (playerRight >= objectLeft) {
+//             return true; // Collision detected
+//         }
+//     }
+//     return false; // No collision detected
+// }
+
+private boolean collTop() {
+    int playerTop = playerY;
+    for (int i = 0; i < objectsY.size(); i += 2) {
+        int objectBottom = objectsY.get(i + 1);
+        if (playerTop <= objectBottom) {
+            return true; // Collision detected
         }
-
-        return false; // No collision detected
     }
+    return false; // No collision detected
+}
+
+private boolean collBottom() {
+    int playerBottom = (int)(playerY + 150 * 0.5);
+    for (int i = 0; i < objectsY.size(); i += 2) {
+        int objectTop = objectsY.get(i);
+        if (playerBottom >= objectTop) {
+            return true; // Collision detected
+        }
+    }
+    return false; // No collision detected
+}
 }
