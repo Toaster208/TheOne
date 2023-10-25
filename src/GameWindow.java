@@ -11,8 +11,9 @@ public class GameWindow extends JPanel implements Runnable {
     KeyHandler keyHandler = new KeyHandler();
     Thread gameThread;
 
+    int groundLevel = 307;
     int playerX = 100;
-    int playerY = 307;
+    int playerY = groundLevel;
     int playerSpeed = 4;
     // int playerDimension = 1;
     // Jump variables
@@ -66,20 +67,23 @@ public class GameWindow extends JPanel implements Runnable {
     }
 
     public void update() {
-        if (colliding()) {
-            if (keyHandler.leftPressed) {
-                playerX+=playerSpeed;
-            } else if (keyHandler.rightPressed) {
-                playerX-=playerSpeed;
-            }
-            if (keyHandler.upPressed) {
-                jumpVelocity=1;
-            }
-            if(!keyHandler.upPressed){
-                isJumping = false;
-            }
-            //TODO: player doesn't fall off platforms after jumping onto them.
-        }
+        //TODO: check for specific collision (top, bottom, right, left)
+        // if (colliding()) {
+        //     if (keyHandler.leftPressed) {
+        //         playerX+=playerSpeed;
+        //     } else if (keyHandler.rightPressed) {
+        //         playerX-=playerSpeed;
+        //     }
+        //     if (keyHandler.upPressed) {
+        //         jumpVelocity=1;
+        //     }
+        //     if(!keyHandler.upPressed){
+        //         isJumping = false;
+        //     }
+        // }
+        // if (!colliding() && ()) {
+
+        // }
         if (keyHandler.upPressed && !isJumping) {
             // Start jumping
             isJumping = true;
@@ -100,10 +104,10 @@ public class GameWindow extends JPanel implements Runnable {
                 playerX += playerSpeed;
             }
 
-            if (playerY >= 307) {
+            if (playerY >= groundLevel) {
                 // Ground level, end the jump
                 isJumping = false;
-                playerY = 307; // Reset to ground level
+                playerY = groundLevel; // Reset to ground level
             }
 
         } else {
