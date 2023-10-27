@@ -77,13 +77,13 @@ public class GameWindow extends JPanel implements Runnable {
             isJumping = false;
         }
 
-        // if (collLeft()) {
-        //     playerX+=playerSpeed;
-        // }
+        if (collLeft()) {
+            playerX+=playerSpeed;
+        }
 
-        // if (collRight()) {
-        //     playerX-=playerSpeed;
-        // }
+        if (collRight()) {
+            playerX+=playerSpeed;
+        }
         // if (colliding()) {
         //     if (keyHandler.leftPressed) {
         //         playerX+=playerSpeed;
@@ -138,80 +138,156 @@ public class GameWindow extends JPanel implements Runnable {
 
     //TODO: Make a level
 
-    public void paintComponent(Graphics g) {
-        super.paintComponent(g);
+public void paintComponent(Graphics g) {
+    super.paintComponent(g);
 
-        Graphics2D g2d = (Graphics2D) g;
-        double s = 0.5; //this variable doesn't work*
-        g2d.setColor(Color.white);
-        g2d.drawLine(0, 600*2/3, 800, 600*2/3);
-        //Todo: shift playerX and playerY to corner of player
-        g2d.fillOval((int)(playerX), (int)(playerY), (int)(30*s), (int)(30*s));
-        g2d.drawLine((int)(playerX+15*s), (int)(playerY+15*s), (int)(playerX+15*s), (int)(playerY+100*s));
-        g2d.drawLine((int)(playerX+15*s), (int)(playerY+40*s), (int)(playerX+40*s), (int)(playerY+75*s));
-        g2d.drawLine((int)(playerX+15*s), (int)(playerY+40*s), (int)(playerX-10*s), (int)(playerY+75*s));
-        g2d.drawLine((int)(playerX+15*s), (int)(playerY+100*s), (int)(playerX-10*s), (int)(playerY+150*s));
-        g2d.drawLine((int)(playerX+15*s), (int)(playerY+100*s), (int)(playerX+40*s), (int)(playerY+150*s));
+    Graphics2D g2d = (Graphics2D) g;
+    g2d.setColor(Color.white);
+    g2d.drawLine(0, 400, 800, 400);
+    g2d.fillOval((playerX), (playerY), 15, 15);
+    g2d.drawLine((playerX + 7), (playerY + 7), (playerX + 7), (playerY + 50));
+    g2d.drawLine((playerX + 7), (playerY + 20), (playerX + 20), (playerY + 37));
+    g2d.drawLine((playerX + 7), (playerY + 20), (playerX - 5), (playerY + 37));
+    g2d.drawLine((playerX + 7), (playerY + 50), (playerX - 5), (playerY + 75));
+    g2d.drawLine((playerX + 7), (playerY + 50), (playerX + 20), (playerY + 75));
 
-        //boundary box
-        g2d.drawLine((int)(playerX-10*s), playerY, (int)(playerX+40*s), playerY);
-        g2d.drawLine((int)(playerX+40*s), playerY, (int)(playerX+40*s), (int)(playerY+150*s));
-        g2d.drawLine((int)(playerX+40*s), (int)(playerY+150*s), (int)(playerX-10*s), (int)(playerY+150*s));
-        g2d.drawLine((int)(playerX-10*s), (int)(playerY+150*s), (int)(playerX-10*s), playerY);
-        
-        //platform in the middle of the screen:
-        g2d.drawLine(800/4, 600/2, 800*3/4, 600/2);
-        objectsX.add(800/4);
-        objectsX.add(800*3/4);
-        objectsY.add(600/2);
-        objectsY.add(600/2);
-        //objectsX.get(i) determines the start X of the platform
-        //objectsX.get(i+1) determines the end X of the platform
-        //objectsY.get(i) determines the start Y of the platform
-        //objectsY.get(i+1) determines the end Y of the platform
-    }
+    g2d.drawLine((playerX - 5), playerY, (playerX + 20), playerY);
+    g2d.drawLine((playerX + 20), playerY, (playerX + 20), (playerY + 75));
+    g2d.drawLine((playerX + 20), (playerY + 75), (playerX - 5), (playerY + 75));
+    g2d.drawLine((playerX - 5), (playerY + 75), (playerX - 5), playerY);
+    
+    addAndDrawLine(200, 300, 600, 300, g);
+    addAndDrawLine(200, 300, 200, 400, g);
+}
 
-// private boolean collLeft() {
-//     int playerLeft = (int)(playerX - 10 * 0.5);
-//     for (int i = 0; i < objectsX.size(); i += 2) {
-//         int objectRight = objectsX.get(i + 1);
-//         if (playerLeft <= objectRight) {
-//             return true; // Collision detected
-//         }
-//     }
-//     return false; // No collision detected
-// }
+private boolean collLeft() {
+    Rectangle playerBoundingBox = new Rectangle(playerX - 5, playerY, 25, 75); // Assuming player's bounding box dimensions are 25x75
 
-// private boolean collRight() {
-//     int playerRight = (int)(playerX + 40 * 0.5);
-//     for (int i = 0; i < objectsX.size(); i += 2) {
-//         int objectLeft = objectsX.get(i);
-//         if (playerRight >= objectLeft) {
-//             return true; // Collision detected
-//         }
-//     }
-//     return false; // No collision detected
-// }
-
-private boolean collTop() {
-    int playerTop = playerY;
-    for (int i = 0; i < objectsY.size(); i += 2) {
+    for (int i = 0; i < objectsX.size(); i += 2) {
+        int objectLeft = objectsX.get(i);
+        int objectRight = objectsX.get(i + 1);
+        int objectTop = objectsY.get(i);
         int objectBottom = objectsY.get(i + 1);
-        if (playerTop <= objectBottom) {
-            return true; // Collision detected
+
+        Rectangle objectBoundingBox = new Rectangle(objectLeft, objectTop, objectRight - objectLeft+1, objectBottom - objectTop+1);
+
+        if (playerBoundingBox.intersects(objectBoundingBox)) {
+            return playerBoundingBox.getMaxX() >= objectBoundingBox.getMinX(); // Collision detected on the left side
         }
     }
+
+    return false; // No collision detected
+}
+
+private boolean collRight() {
+    Rectangle playerBoundingBox = new Rectangle(playerX - 5, playerY, 25, 75); // Assuming player's bounding box dimensions are 25x75
+
+    for (int i = 0; i < objectsX.size(); i += 2) {
+        int objectLeft = objectsX.get(i);
+        int objectRight = objectsX.get(i + 1);
+        int objectTop = objectsY.get(i);
+        int objectBottom = objectsY.get(i + 1);
+
+        Rectangle objectBoundingBox = new Rectangle(objectLeft, objectTop, objectRight - objectLeft+1, objectBottom - objectTop+1);
+
+        if (playerBoundingBox.intersects(objectBoundingBox)) {
+            return playerBoundingBox.getMinX() <= objectBoundingBox.getMaxX(); // Collision detected on the right side
+        }
+    }
+
+    return false; // No collision detected
+}
+
+private boolean collTop() {
+    Rectangle playerBoundingBox = new Rectangle(playerX - 5, playerY, 25, 75); // Assuming player's bounding box dimensions are 25x75
+
+    for (int i = 0; i < objectsX.size(); i += 2) {
+        int objectLeft = objectsX.get(i);
+        int objectRight = objectsX.get(i + 1);
+        int objectTop = objectsY.get(i);
+        int objectBottom = objectsY.get(i + 1);
+
+        Rectangle objectBoundingBox = new Rectangle(objectLeft, objectTop, objectRight - objectLeft+1, objectBottom - objectTop+1);
+
+        if (playerBoundingBox.intersects(objectBoundingBox)) {
+            return playerBoundingBox.getMaxY() >= objectBoundingBox.getMinY(); // Collision detected on the top side
+        }
+    }
+
     return false; // No collision detected
 }
 
 private boolean collBottom() {
-    int playerBottom = (int)(playerY + 150 * 0.5);
-    for (int i = 0; i < objectsY.size(); i += 2) {
+    Rectangle playerBoundingBox = new Rectangle(playerX - 5, playerY, 25, 75); // Assuming player's bounding box dimensions are 25x75
+
+    for (int i = 0; i < objectsX.size(); i += 2) {
+        int objectLeft = objectsX.get(i);
+        int objectRight = objectsX.get(i + 1);
         int objectTop = objectsY.get(i);
-        if (playerBottom >= objectTop) {
-            return true; // Collision detected
+        int objectBottom = objectsY.get(i + 1);
+
+        Rectangle objectBoundingBox = new Rectangle(objectLeft, objectTop, objectRight - objectLeft+1, objectBottom - objectTop+1);
+
+        if (playerBoundingBox.intersects(objectBoundingBox)) {
+            return playerBoundingBox.getMinY() <= objectBoundingBox.getMaxY(); // Collision detected on the bottom side
         }
     }
+
     return false; // No collision detected
 }
+
+    // private boolean collLeft() {
+    //     int playerLeft = playerX-5;
+    //     for (int i = 0; i < objectsX.size(); i += 2) {
+    //         int objectRight = objectsX.get(i + 1);
+    //         if (playerLeft <= objectRight) {
+    //             return true; // Collision detected
+    //         }
+    //     }
+    //     return false; // No collision detected
+    // }
+
+
+    
+    // private boolean collRight() {
+    //     int playerRight = playerX+20;
+    //     for (int i = 0; i < objectsX.size(); i += 2) {
+    //         int objectLeft = objectsX.get(i);
+    //         if (playerRight >= objectLeft) {
+    //             return true; // Collision detected
+    //         }
+    //     }
+    //     return false; // No collision detected
+    // }
+
+    // private boolean collTop() {
+    //     int playerTop = playerY;
+    //     for (int i = 0; i < objectsY.size(); i += 2) {
+    //         int objectBottom = objectsY.get(i + 1);
+    //         if (playerTop <= objectBottom) {
+    //             return true; // Collision detected
+    //         }
+    //     }
+    //     return false; // No collision detected
+    // }
+
+    // private boolean collBottom() {
+    //     int playerBottom = playerY+75;
+    //     for (int i = 0; i < objectsY.size(); i += 2) {
+    //         int objectTop = objectsY.get(i);
+    //         if (playerBottom >= objectTop) {
+    //             return true; // Collision detected
+    //         }
+    //     }
+    //     return false; // No collision detected
+    // }
+
+    private void addAndDrawLine(int x1, int y1, int x2, int y2, Graphics g) {
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.drawLine(x1, y1, x2, y2);
+        objectsX.add(x1);
+        objectsX.add(x2);
+        objectsY.add(y1);
+        objectsY.add(y2);
+    }
 }
