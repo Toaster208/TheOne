@@ -69,9 +69,11 @@ public class GameWindow extends JPanel implements Runnable {
     public void update() {
         //TODO: check for specific collision (top, bottom, right, left)
         //FIXME: collLeft and collRight detect at the same time, nullifying the collison. fix their if statements.
-        if (collTop()) {
-            jumpVelocity = 1;
-        }
+
+        //Big change: TODO: make (and work on) a whole new class for objects/terrain
+        // if (collTop()) {
+        //     jumpVelocity = 1;
+        // }
 
         if (collBottom()) {
             isJumping = false;
@@ -79,10 +81,14 @@ public class GameWindow extends JPanel implements Runnable {
 
         if (collLeft()) {
             playerX+=playerSpeed;
+        } else if (collTop()) {
+            jumpVelocity = -10;
         }
 
         if (collRight()) {
-            playerX+=playerSpeed;
+            playerX-=playerSpeed;
+        } else if (collTop()) {
+            jumpVelocity = 1;
         }
         // if (colliding()) {
         //     if (keyHandler.leftPressed) {
@@ -160,6 +166,7 @@ public void paintComponent(Graphics g) {
     addAndDrawLine(200, 300, 200, 400, g);
 }
 
+
 private boolean collLeft() {
     Rectangle playerBoundingBox = new Rectangle(playerX - 5, playerY, 25, 75); // Assuming player's bounding box dimensions are 25x75
 
@@ -172,7 +179,10 @@ private boolean collLeft() {
         Rectangle objectBoundingBox = new Rectangle(objectLeft, objectTop, objectRight - objectLeft+1, objectBottom - objectTop+1);
 
         if (playerBoundingBox.intersects(objectBoundingBox)) {
-            return playerBoundingBox.getMaxX() >= objectBoundingBox.getMinX(); // Collision detected on the left side
+            if (playerBoundingBox.getMaxX() >= objectBoundingBox.getMinX()) {
+                System.out.println("left");
+                return true;
+            }
         }
     }
 
@@ -191,7 +201,10 @@ private boolean collRight() {
         Rectangle objectBoundingBox = new Rectangle(objectLeft, objectTop, objectRight - objectLeft+1, objectBottom - objectTop+1);
 
         if (playerBoundingBox.intersects(objectBoundingBox)) {
-            return playerBoundingBox.getMinX() <= objectBoundingBox.getMaxX(); // Collision detected on the right side
+            if (playerBoundingBox.getMinX() <= objectBoundingBox.getMaxX()) {
+                System.out.println("right");
+                return true;
+            }
         }
     }
 
@@ -210,7 +223,11 @@ private boolean collTop() {
         Rectangle objectBoundingBox = new Rectangle(objectLeft, objectTop, objectRight - objectLeft+1, objectBottom - objectTop+1);
 
         if (playerBoundingBox.intersects(objectBoundingBox)) {
-            return playerBoundingBox.getMaxY() >= objectBoundingBox.getMinY(); // Collision detected on the top side
+            if (playerBoundingBox.getMaxY() >= objectBoundingBox.getMinY()) {
+                playerY+=1;
+                System.out.println("top");
+                return true;
+            }
         }
     }
 
@@ -229,7 +246,11 @@ private boolean collBottom() {
         Rectangle objectBoundingBox = new Rectangle(objectLeft, objectTop, objectRight - objectLeft+1, objectBottom - objectTop+1);
 
         if (playerBoundingBox.intersects(objectBoundingBox)) {
-            return playerBoundingBox.getMinY() <= objectBoundingBox.getMaxY(); // Collision detected on the bottom side
+            if (playerBoundingBox.getMinY() <= objectBoundingBox.getMaxY()) {
+                playerY-=1;
+                System.out.println("bottom");
+                return true; // Collision detected on the bottom side
+            }
         }
     }
 
@@ -289,5 +310,31 @@ private boolean collBottom() {
         objectsX.add(x2);
         objectsY.add(y1);
         objectsY.add(y2);
+    }
+
+    private Point getIntersectionPoint(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4) {
+        int denominator = ((x2 - x1) * (y4 - y3)) - ((y2 - y1) * (x4 - x3));
+    
+        if (denominator == 0) {
+            return null; // Lines are parallel, no intersection point
+        }
+    
+        int numerator1 = ((y1 - y3) * (x4 - x3)) - ((x1 - x3) * (y4 - y3));
+        int numerator2 = ((y1 - y3) * (x2 - x1)) - ((x1 - x3) * (y2 - y1));
+    
+        if (numerator1 == 0 || numerator2 == 0) {
+            return null; // Lines are collinear, no intersection point
+        }
+    
+        float r = (float) numerator1 / denominator;
+        float s = (float) numerator2 / denominator;
+    
+        if (r >= 0 && r <= 1 && s >= 0 && s <= 1) {
+            int x = x1 + (int) (r * (x2 - x1));
+            int y = y1 + (int) (r * (y2 - y1));
+            return new Point(x, y); // Intersection point
+        }
+    
+        return null; // Lines do not intersect within the given segments
     }
 }
