@@ -66,27 +66,18 @@ public class GameWindow extends JPanel implements Runnable {
     }
 
     public void update() {
-        //TODO: check for specific collision (top, bottom, right, left)
-        //FIXME: collLeft and collRight detect at the same time, nullifying the collison. fix their if statements.
-
-        //Big change: TODO: make rectangles terrain, check if rectangles intersect.
-
         if (keyHandler.upPressed && !isJumping) {
             // Start jumping
             isJumping = true;
-            jumpVelocity = -10; // Adjust the initial jump velocity
+            jumpVelocity = -15; // Adjust the initial jump velocity
         }
 
-        if (isJumping) {
+        if (isJumping) { //TODO: Player goes all the way thru object before colliding, messing up stuff!!
             // Update jump physics
             if (!keyHandler.upPressed) {
                 jumpVelocity = Math.abs(jumpVelocity);
             }
             playerY += jumpVelocity;
-            if (collide()) {
-                playerY -= jumpVelocity;
-                isJumping = false;
-            }
             jumpVelocity += jumpAcceleration;
 
             if (playerY >= groundLevel) {
@@ -95,6 +86,19 @@ public class GameWindow extends JPanel implements Runnable {
                 playerY = groundLevel; // Reset to ground level
             }
 
+        } else if (!collide() && !isJumping) {
+            for (Rectangle object : objects) {
+                //TODO: 
+                if (playerY + 10 > object.y) {
+                    isJumping = true;
+                    jumpVelocity = 0;
+                }
+            }
+        }
+        if (collide() && !keyHandler.leftPressed && !keyHandler.rightPressed) {
+            while (collide()) {
+                playerY -= 5;
+            }
         }
 
         if (keyHandler.leftPressed) {
@@ -127,10 +131,10 @@ public class GameWindow extends JPanel implements Runnable {
         g2d.drawLine((playerX + 7), (playerY + 50), (playerX + 20), (playerY + 75));
 
         // bounding box (for visual)
-        g2d.drawLine((playerX - 5), playerY, (playerX + 20), playerY);
-        g2d.drawLine((playerX + 20), playerY, (playerX + 20), (playerY + 75));
-        g2d.drawLine((playerX + 20), (playerY + 75), (playerX - 5), (playerY + 75));
-        g2d.drawLine((playerX - 5), (playerY + 75), (playerX - 5), playerY);
+        // g2d.drawLine((playerX - 5), playerY, (playerX + 20), playerY);
+        // g2d.drawLine((playerX + 20), playerY, (playerX + 20), (playerY + 75));
+        // g2d.drawLine((playerX + 20), (playerY + 75), (playerX - 5), (playerY + 75));
+        // g2d.drawLine((playerX - 5), (playerY + 75), (playerX - 5), playerY);
         //TODO: player looks like it is far away from wall when colliding, slightly make bigger to compensate.
         
         // addAndDrawLine(200, 300, 600, 300, g);
