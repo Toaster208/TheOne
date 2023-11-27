@@ -14,11 +14,11 @@ public class GameWindow extends JPanel implements Runnable {
     int groundLevel = 325;
     int playerX = 100;
     int playerY = groundLevel;
-    int playerSpeed = 3;
+    int playerSpeed = 4; //Tweak speed later
     // int playerDimension = 1;
     // Jump variables
     double jumpVelocity = 0; // Initial jump velocity
-    double jumpAcceleration = 0.5; // Acceleration due to gravity
+    double jumpAcceleration = .75; // Acceleration due to gravity
     boolean isJumping = false;
     ArrayList<Rectangle> objects = new ArrayList<Rectangle>();
 
@@ -66,13 +66,28 @@ public class GameWindow extends JPanel implements Runnable {
     }
 
     public void update() {
+        // check closest ground to land on: TODO:(make this its own function later)
+
+        // arrange from highest to lowest first
+        int tempY = groundLevel - 75; //CLOSE TO FIGURING IT OUT
+        for (Rectangle object : objects) { //disregards player falling off an object
+            if (playerX >= object.getX() && playerX <= object.getX()+object.getWidth()) {
+                if (object.getY() < tempY) {
+                    tempY = (int) object.getY();
+                    groundLevel = (int) object.getY() - 75;
+                    System.out.println(groundLevel);
+                }
+            }
+        }
+        // ----------------------------------------
+
         if (keyHandler.upPressed && !isJumping) {
             // Start jumping
             isJumping = true;
             jumpVelocity = -15; // Adjust the initial jump velocity
         }
 
-        if (isJumping) { //TODO: Player goes all the way thru object before colliding, messing up stuff!!
+        if (isJumping) {
             // Update jump physics
             if (!keyHandler.upPressed) {
                 jumpVelocity = Math.abs(jumpVelocity);
@@ -88,18 +103,13 @@ public class GameWindow extends JPanel implements Runnable {
 
         } else if (!collide() && !isJumping) {
             for (Rectangle object : objects) {
-                //TODO: 
                 if (playerY + 10 > object.y) {
                     isJumping = true;
                     jumpVelocity = 0;
                 }
             }
         }
-        if (collide() && !keyHandler.leftPressed && !keyHandler.rightPressed) {
-            while (collide()) {
-                playerY -= 5;
-            }
-        }
+        
 
         if (keyHandler.leftPressed) {
             playerX -= playerSpeed;
@@ -123,12 +133,14 @@ public class GameWindow extends JPanel implements Runnable {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setColor(Color.white);
         g2d.drawLine(0, 400, 800, 400);
+        //construction of player character
         g2d.fillOval((playerX), (playerY), 15, 15);
         g2d.drawLine((playerX + 7), (playerY + 7), (playerX + 7), (playerY + 50));
         g2d.drawLine((playerX + 7), (playerY + 20), (playerX + 20), (playerY + 37));
         g2d.drawLine((playerX + 7), (playerY + 20), (playerX - 5), (playerY + 37));
         g2d.drawLine((playerX + 7), (playerY + 50), (playerX - 5), (playerY + 75));
         g2d.drawLine((playerX + 7), (playerY + 50), (playerX + 20), (playerY + 75));
+        
 
         // bounding box (for visual)
         // g2d.drawLine((playerX - 5), playerY, (playerX + 20), playerY);
@@ -141,6 +153,8 @@ public class GameWindow extends JPanel implements Runnable {
         // addAndDrawLine(200, 300, 200, 400, g);
         g2d.drawRect(200, 300, 400, 100);
         objects.add(new Rectangle(200, 300, 400, 100));
+        g2d.drawRect(380, 280, 40, 40);
+        objects.add(0, new Rectangle(380, 280, 40, 40));
     }
 
     private boolean collide() {
