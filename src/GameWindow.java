@@ -15,6 +15,7 @@ public class GameWindow extends JPanel implements Runnable {
     int playerX = 100;
     int playerY = groundLevel;
     int playerSpeed = 4; //Tweak speed later
+    int tempY = groundLevel;
     // int playerDimension = 1;
     // Jump variables
     double jumpVelocity = 0; // Initial jump velocity
@@ -69,7 +70,6 @@ public class GameWindow extends JPanel implements Runnable {
         // check closest ground to land on: TODO:(make this its own function later)
 
         // arrange from highest to lowest first
-        int tempY = groundLevel - 75; //CLOSE TO FIGURING IT OUT
         for (Rectangle object : objects) { //disregards player falling off an object
             if (playerX >= object.getX() && playerX <= object.getX()+object.getWidth()) {
                 if (object.getY() < tempY) {
