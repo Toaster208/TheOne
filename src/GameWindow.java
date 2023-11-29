@@ -15,7 +15,6 @@ public class GameWindow extends JPanel implements Runnable {
     int playerX = 100;
     int playerY = groundLevel;
     int playerSpeed = 4; //Tweak speed later
-    int tempY = groundLevel;
     // int playerDimension = 1;
     // Jump variables
     double jumpVelocity = 0; // Initial jump velocity
@@ -67,17 +66,11 @@ public class GameWindow extends JPanel implements Runnable {
     }
 
     public void update() {
-        // check closest ground to land on: TODO:(make this its own function later)
-
-        // arrange from highest to lowest first
-        for (Rectangle object : objects) { //disregards player falling off an object
-            if (playerX >= object.getX() && playerX <= object.getX()+object.getWidth()) {
-                if (object.getY() < tempY) {
-                    tempY = (int) object.getY();
-                    groundLevel = (int) object.getY() - 75;
-                    System.out.println(groundLevel);
-                }
-            }
+        // check closest ground to land on: (make this its own function later)
+        for (Rectangle object : objects) {
+            if ((playerX+20 >= object.getX() && playerX <= object.getX()+object.getWidth()) || (playerX <= object.getX() && playerX+20 >= object.getX()+object.getWidth())) { //if player above object
+                groundLevel = (int) object.getY() - 75; //new place to land
+            } // (will be set higher, objects are arranged from bottom to top)
         }
         // ----------------------------------------
 
@@ -101,13 +94,9 @@ public class GameWindow extends JPanel implements Runnable {
                 playerY = groundLevel; // Reset to ground level
             }
 
-        } else if (!collide() && !isJumping) {
-            for (Rectangle object : objects) {
-                if (playerY + 10 > object.y) {
-                    isJumping = true;
-                    jumpVelocity = 0;
-                }
-            }
+        } else if (playerY < groundLevel) {
+            isJumping = true;
+            jumpVelocity = 0;
         }
         
 
@@ -132,7 +121,6 @@ public class GameWindow extends JPanel implements Runnable {
 
         Graphics2D g2d = (Graphics2D) g;
         g2d.setColor(Color.white);
-        g2d.drawLine(0, 400, 800, 400);
         //construction of player character
         g2d.fillOval((playerX), (playerY), 15, 15);
         g2d.drawLine((playerX + 7), (playerY + 7), (playerX + 7), (playerY + 50));
@@ -147,14 +135,15 @@ public class GameWindow extends JPanel implements Runnable {
         // g2d.drawLine((playerX + 20), playerY, (playerX + 20), (playerY + 75));
         // g2d.drawLine((playerX + 20), (playerY + 75), (playerX - 5), (playerY + 75));
         // g2d.drawLine((playerX - 5), (playerY + 75), (playerX - 5), playerY);
-        //TODO: player looks like it is far away from wall when colliding, slightly make bigger to compensate.
         
         // addAndDrawLine(200, 300, 600, 300, g);
         // addAndDrawLine(200, 300, 200, 400, g);
+        g2d.drawRect(0, 400, 799, 400);
+        objects.add(new Rectangle(0, 400, 799, 400));
         g2d.drawRect(200, 300, 400, 100);
         objects.add(new Rectangle(200, 300, 400, 100));
         g2d.drawRect(380, 280, 40, 40);
-        objects.add(0, new Rectangle(380, 280, 40, 40));
+        objects.add(new Rectangle(380, 280, 40, 40));
     }
 
     private boolean collide() {
