@@ -22,6 +22,9 @@ public class GameWindow extends JPanel implements Runnable {
     boolean isJumping = false;
     ArrayList<Rectangle> objects = new ArrayList<Rectangle>();
 
+    boolean rightDisabled = false;
+    boolean leftDisabled = false;
+
     public GameWindow() {
         this.setPreferredSize(new Dimension(800, 600));
         this.setBackground(Color.black);
@@ -100,21 +103,27 @@ public class GameWindow extends JPanel implements Runnable {
         }
         
 
-        if (keyHandler.leftPressed) {
+        if (keyHandler.leftPressed && !leftDisabled) { //TODO: not working, player gets jump boosted at edge of wall
             playerX -= playerSpeed;
             while (collide()) {
-                playerX += 1;
+                if (!leftDisabled) {
+                    playerX += 4;
+                }
+                leftDisabled = true;
             }
+            leftDisabled = false;
         }
-        if (keyHandler.rightPressed) {
+        if (keyHandler.rightPressed && !rightDisabled) {
             playerX += playerSpeed;
             while (collide()) {
-                playerX -= 1;
+                if (!rightDisabled) {
+                    playerX -= 4;
+                }
+                rightDisabled = true;
             }
+            rightDisabled = false;
         }
     }
-
-    //TODO: Make a level
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -131,23 +140,26 @@ public class GameWindow extends JPanel implements Runnable {
         
 
         // bounding box (for visual)
-        // g2d.drawLine((playerX - 5), playerY, (playerX + 20), playerY);
-        // g2d.drawLine((playerX + 20), playerY, (playerX + 20), (playerY + 75));
-        // g2d.drawLine((playerX + 20), (playerY + 75), (playerX - 5), (playerY + 75));
-        // g2d.drawLine((playerX - 5), (playerY + 75), (playerX - 5), playerY);
+        g2d.drawLine((playerX - 5), playerY, (playerX + 20), playerY);
+        g2d.drawLine((playerX + 20), playerY, (playerX + 20), (playerY + 75));
+        g2d.drawLine((playerX + 20), (playerY + 75), (playerX - 5), (playerY + 75));
+        g2d.drawLine((playerX - 5), (playerY + 75), (playerX - 5), playerY);
         
         // addAndDrawLine(200, 300, 600, 300, g);
         // addAndDrawLine(200, 300, 200, 400, g);
+
+            //TODO: Make a level
+
         g2d.drawRect(0, 400, 799, 400);
         objects.add(new Rectangle(0, 400, 799, 400));
         g2d.drawRect(200, 300, 400, 100);
         objects.add(new Rectangle(200, 300, 400, 100));
-        g2d.drawRect(380, 280, 40, 40);
-        objects.add(new Rectangle(380, 280, 40, 40));
+        g2d.drawRect(380, 260, 40, 40);
+        objects.add(new Rectangle(380, 260, 40, 40));
     }
 
     private boolean collide() {
-        Rectangle playerBox = new Rectangle(playerX, playerY, 25, 75);
+        Rectangle playerBox = new Rectangle(playerX-5, playerY, 24, 75);
         for (Rectangle object : objects) {
             if (object.intersects(playerBox)) {
                 return true;
